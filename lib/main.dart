@@ -41,7 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
 
-    var textS = TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w300);
+    var textS = TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w300);
 
     pickAndNav(String type) async {
       var res = await Permission.mediaLibrary.isUndetermined || await Permission.mediaLibrary.isPermanentlyDenied || await Permission.mediaLibrary.isDenied;
@@ -68,9 +68,9 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Container(
-                  margin: EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                  margin: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   padding: EdgeInsets.only(top: 16),
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(24), color: Colors.blueAccent),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(32), color: Colors.blueAccent),
                   child: Column(
                     children: <Widget>[
                       Text("Quality: " + value.toInt().toString() + "%", style: textS,),
@@ -88,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 FlatButton(
                   color: Colors.blueAccent,
-                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 32),
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 48),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
                   onPressed: () async {
                     try {
@@ -103,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Padding(padding: EdgeInsets.only(bottom: 12)),
                 FlatButton(
                   color: Colors.blueAccent,
-                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 32),
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 48),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
                   onPressed: () async {
                     try {
