@@ -22,6 +22,23 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NFCReaderUsageDescription</key>
+	<string>Example: a</string>
+
+	<key>NSCameraUsageDescription</key>
+	<string>Example: abcdef</string>
+
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Example: abcdefghijklmn</string>
+
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Example: abcdefghijklmno</string>
+
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Example: abcdefghijklmnopqrst</string>
+
+	<key>NSFaceIDUsageDescription</key>
+	<string>Example: abcdefghijklmnopqrstu</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
