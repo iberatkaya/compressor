@@ -1,4 +1,4 @@
-package com.example.compressor
+package com.kaya.compressor
 
 import io.flutter.embedding.android.FlutterActivity
 
