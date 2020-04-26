@@ -9,6 +9,10 @@
 .history
 .svn/
 
+ios/Runner/Info.plist
+ios/GoogleService-Info.plist
+lib/const.dart
+
 # IntelliJ related
 *.iml
 *.ipr

@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_video_compress/flutter_video_compress.dart';
 import 'package:video_player/video_player.dart';
-
+import 'package:gallery_saver/gallery_saver.dart';
 import 'utils.dart';
 
 class VideoPage extends StatefulWidget {
@@ -17,7 +17,6 @@ class VideoPage extends StatefulWidget {
 
 class _VideoPageState extends State<VideoPage> {
 
-  Subscription _subscription;
   VideoPlayerController _controller;
   VideoPlayerController _controller2;
   Future<void> _initializer;
@@ -26,6 +25,7 @@ class _VideoPageState extends State<VideoPage> {
   bool loaded2 = false;
   int compFileSize = 0;
   var textS = TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w300);
+  var textSub = TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w200);
 
   @override
   void initState() {
@@ -60,7 +60,8 @@ class _VideoPageState extends State<VideoPage> {
       quality = VideoQuality.HighestQuality;
     }
     var compressor = FlutterVideoCompress();
-    var info = await compressor.compressVideo(widget.file.absolute.path, quality: quality);
+    var info = await compressor.compressVideo(widget.file.absolute.path, quality: quality, includeAudio: true);
+    await GallerySaver.saveVideo(info.path);
     return info;
   }
 
@@ -80,12 +81,13 @@ class _VideoPageState extends State<VideoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Compressing Video'),
+        title: Text('Compress Video'),
+        elevation: 1,
       ),
       body: Center(
         child: SingleChildScrollView(
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 4),
+            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 12),
             child: Column(
               children: <Widget>[ 
                 FutureBuilder(
@@ -96,10 +98,15 @@ class _VideoPageState extends State<VideoPage> {
                         children: <Widget>[
                           Container(
                             padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                            margin: EdgeInsets.symmetric(vertical: 8),
-                            child: Text("Old File Size: " + formatBytes(widget.file.lengthSync(), 2), style: textS),
-                            decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(24)),
-                          ),              
+                            margin: EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            child: Column(
+                              children: <Widget>[
+                                Text("Old File Size: " + formatBytes(widget.file.lengthSync(), 2), style: textS),
+                                Divider(color: Colors.transparent, height: 0,),
+                              ],
+                            ),
+                            decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(12)),
+                          ),       
                           AspectRatio(
                             aspectRatio: _controller.value.aspectRatio,
                             child: VideoPlayer(_controller)
@@ -107,6 +114,7 @@ class _VideoPageState extends State<VideoPage> {
                           FlatButton(
                             child: Icon(playing ? Icons.pause : Icons.play_arrow), 
                             color: Colors.blueAccent,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             onPressed: () async {
                               playing ? await _controller.pause() : await _controller.play();
                               setState(() {
@@ -134,13 +142,24 @@ class _VideoPageState extends State<VideoPage> {
                   Column(
                     children: <Widget>[
                       Column(
-                        children: <Widget>[
+                        children: <Widget>[   
                           Container(
-                            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                            margin: EdgeInsets.only(bottom: 8),
-                            child: Text("New File Size: " + formatBytes(compFileSize, 2), style: textS),
-                            decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(24)),
-                          ),          
+                            padding: EdgeInsets.symmetric(vertical: 8),
+                            margin: EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            child: Column(
+                              children: <Widget>[
+                                Text("New File Size: " + formatBytes(compFileSize, 2), style: textS),
+                                Divider(color: Colors.white),
+                                Text("Reduction: " + ((widget.file.lengthSync() - compFileSize) / widget.file.lengthSync() * 100).toStringAsFixed(0) + "%", style: textSub),
+                                if(widget.file.lengthSync() - compFileSize < 0)
+                                  Padding(
+                                    padding: const EdgeInsets.fromLTRB(12, 6, 12, 0),
+                                    child: Text("The quality was too high for the reduction to occur. Please decrease the quality for compression.", style: textSub),
+                                  ),
+                              ],
+                            ),
+                            decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(12)),
+                          ),    
                           AspectRatio(
                             aspectRatio: _controller.value.aspectRatio,
                             child: VideoPlayer(_controller2)
@@ -148,6 +167,7 @@ class _VideoPageState extends State<VideoPage> {
                           FlatButton(
                             child: Icon(playing2 ? Icons.pause : Icons.play_arrow), 
                             color: Colors.blueAccent,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             onPressed: () async {
                               playing2 ? await _controller2.pause() : await _controller2.play();
                               setState(() {

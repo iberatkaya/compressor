@@ -17,6 +17,8 @@ class ImagePage extends StatefulWidget {
 
 class _ImagePageState extends State<ImagePage> {
 
+  var textS = TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w300);
+  var textSub = TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w200);
 
   Future<File> fetchImage () async {
     var result = await FlutterImageCompress.compressAndGetFile(
@@ -34,12 +36,13 @@ class _ImagePageState extends State<ImagePage> {
     
     return Scaffold(
       appBar: AppBar(
-        title: Text('Compressing Image'),
+        title: Text('Compress Image'),
+        elevation: 1,
       ),
       body: Center(
         child: SingleChildScrollView(
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 4),
+            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 12),
             child: Column(
               children: <Widget>[
                 FutureBuilder(
@@ -50,7 +53,27 @@ class _ImagePageState extends State<ImagePage> {
                       Image image = Image.memory(bytes);
                       return Column(
                         children: <Widget>[
-                          Text("Old File Size: " + formatBytes(widget.file.lengthSync(), 2)),          
+                          Container(
+                            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                            margin: EdgeInsets.fromLTRB(12, 0, 12, 8),
+                            child: Text("Double click the image to zoom and examine the details.", style: textSub),
+                            decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(12)),
+                          ),             
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 8),
+                            child: Divider(),
+                          ),      
+                          Container(
+                            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                            margin: EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            child: Column(
+                              children: <Widget>[
+                                Text("Old File Size: " + formatBytes(widget.file.lengthSync(), 2), style: textS),
+                                Divider(color: Colors.transparent, height: 0,),
+                              ],
+                            ),
+                            decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(12)),
+                          ),                   
                           Container(
                             height: MediaQuery.of(context).size.height * 0.35, 
                             width: MediaQuery.of(context).size.width,
@@ -60,10 +83,24 @@ class _ImagePageState extends State<ImagePage> {
                                 )
                               )
                           ),  
-                          Padding(
-                            padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.height * 0.03),
-                          ),
-                          Text("New File Size: " + formatBytes(snapshot.data.lengthSync(), 2)),          
+                          Container(child: Divider(color: Colors.blue,), margin: EdgeInsets.symmetric(vertical: 8),),
+                          Container(
+                            padding: EdgeInsets.symmetric(vertical: 8),
+                            margin: EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            child: Column(
+                              children: <Widget>[
+                                Text("New File Size: " + formatBytes(snapshot.data.lengthSync(), 2), style: textS),
+                                Divider(color: Colors.white),
+                                Text("Reduction: " + ((widget.file.lengthSync() - snapshot.data.lengthSync()) / widget.file.lengthSync() * 100).toStringAsFixed(0) + "%", style: textSub),
+                                if(widget.file.lengthSync() - snapshot.data.lengthSync() < 0)
+                                  Padding(
+                                    padding: const EdgeInsets.fromLTRB(12, 6, 12, 0),
+                                    child: Text("The quality was too high for the reduction to occur. Please decrease the quality for compression.", style: textSub),
+                                  ),
+                              ],
+                            ),
+                            decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(12)),
+                          ),                   
                           Container(
                             height: MediaQuery.of(context).size.height * 0.35, 
                             width: MediaQuery.of(context).size.width,

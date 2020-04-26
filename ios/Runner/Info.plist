@@ -11,7 +11,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>compressor</string>
+	<string>Compressor</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -20,25 +20,20 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-5374812845622263~7817585851</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NFCReaderUsageDescription</key>
-	<string>Example: a</string>
-
-	<key>NSCameraUsageDescription</key>
-	<string>Example: abcdef</string>
-
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Example: abcdefghijklmn</string>
-
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Example: abcdefghijklmno</string>
-
+	<string>Give permission to compress a video or image.</string>
 	<key>NSAppleMusicUsageDescription</key>
-	<string>Example: abcdefghijklmnopqrst</string>
-
-	<key>NSFaceIDUsageDescription</key>
-	<string>Example: abcdefghijklmnopqrstu</string>
+	<string>Give permission to compress a video or image.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Give permission to compress a video or image.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Give permission to compress a video or image.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Give permission to compress a video or image.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
