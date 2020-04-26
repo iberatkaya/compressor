@@ -2,7 +2,6 @@ import 'package:compressor/const.dart';
 import 'package:compressor/video.dart';
 import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_video_compress/flutter_video_compress.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:image_picker/image_picker.dart';
@@ -45,9 +44,9 @@ class _MyHomePageState extends State<MyHomePage> {
   int ctr = 0;
   List<InterstitialAd> intAd = [];
   int adFreq = 2;
-  var textS = TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w300);
-  var textSub = TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w200);
-  var textQuality = TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w300);
+  var textS = TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w400);
+  var textSub = TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w300);
+  var textQuality = TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w400);
 
 
   @override

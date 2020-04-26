@@ -5,6 +5,7 @@ import 'package:gallery_saver/gallery_saver.dart';
 import 'package:photo_view/photo_view.dart';
 import './utils.dart';
 import 'package:random_string/random_string.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ImagePage extends StatefulWidget {
   ImagePage({Key key, this.file, this.quality}) : super(key: key);
@@ -18,13 +19,15 @@ class ImagePage extends StatefulWidget {
 
 class _ImagePageState extends State<ImagePage> {
 
-  var textS = TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w300);
-  var textSub = TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w200);
+  var textS = TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w400);
+  var textSub = TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w300);
 
   Future<File> fetchImage () async {
     var randomname = randomAlphaNumeric(16);
+    Directory tempDir = await getTemporaryDirectory();
+    String tempPath = tempDir.path;
     File result = await FlutterImageCompress.compressAndGetFile(
-      widget.file.absolute.path, widget.file.absolute.parent.path + "/" + randomname + ".jpg", 
+      widget.file.absolute.path, tempPath + "/" + randomname + ".jpg", 
       format: CompressFormat.jpeg,
       quality: widget.quality
     );
@@ -33,9 +36,7 @@ class _ImagePageState extends State<ImagePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-
-    
+  Widget build(BuildContext context) {    
     return Scaffold(
       appBar: AppBar(
         title: Text('Compress Image'),

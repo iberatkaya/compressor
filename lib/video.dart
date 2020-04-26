@@ -24,8 +24,8 @@ class _VideoPageState extends State<VideoPage> {
   bool playing2 = false;
   bool loaded2 = false;
   int compFileSize = 0;
-  var textS = TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w300);
-  var textSub = TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w200);
+  var textS = TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w400);
+  var textSub = TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w300);
 
   @override
   void initState() {
