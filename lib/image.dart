@@ -21,6 +21,7 @@ class _ImagePageState extends State<ImagePage> {
 
   var textS = TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w400);
   var textSub = TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w300);
+  bool lock = false;
 
   Future<File> fetchImage () async {
     var randomname = randomAlphaNumeric(16);
@@ -31,7 +32,6 @@ class _ImagePageState extends State<ImagePage> {
       format: CompressFormat.jpeg,
       quality: widget.quality
     );
-    await GallerySaver.saveImage(result.absolute.path, albumName: "Compressed");
     return result;
   }
 
@@ -58,12 +58,12 @@ class _ImagePageState extends State<ImagePage> {
                         Container(
                           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
                           margin: EdgeInsets.fromLTRB(12, 0, 12, 8),
-                          child: Text("Double click the image to zoom and examine the details.", style: textSub),
+                          child: Text("Double click the image to zoom and examine the details. Click the save button to save the image to the gallery.", style: textSub),
                           decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(12)),
                         ),             
                         Padding(
                           padding: EdgeInsets.only(bottom: 8),
-                          child: Divider(),
+                          child: Divider(color: Colors.blue,),
                         ),      
                         Container(
                           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
@@ -112,6 +112,35 @@ class _ImagePageState extends State<ImagePage> {
                             )
                           )
                         ),
+                        Container(child: Divider(color: Colors.blue,), margin: EdgeInsets.symmetric(vertical: 8),),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 28),
+                          child: IgnorePointer(
+                            ignoring: lock,
+                            child: FlatButton(
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              color: Colors.blueAccent,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: EdgeInsets.only(right: 4),
+                                    child: Text("Save To Gallery", style: textS),
+                                  ),
+                                  Icon(Icons.save_alt, color: Colors.white,)
+                                ],
+                              ),
+                              onPressed: () async {
+                                setState(() {
+                                  lock = true;
+                                });
+                                await GallerySaver.saveImage(snapshot.data.absolute.path, albumName: "Compressed");
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ),
+                        )
                       ],
                     );
                   }

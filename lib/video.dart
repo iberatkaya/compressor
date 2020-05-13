@@ -26,6 +26,8 @@ class _VideoPageState extends State<VideoPage> {
   int compFileSize = 0;
   var textS = TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w400);
   var textSub = TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w300);
+  File compressedVideo;
+  bool lock = false;
 
   @override
   void initState() {
@@ -39,6 +41,7 @@ class _VideoPageState extends State<VideoPage> {
       });
     }
     fetchVideo().then((value) async {
+      compressedVideo = value.file;
       await setController2(value.file);
     });
   }
@@ -66,7 +69,6 @@ class _VideoPageState extends State<VideoPage> {
     }
     var compressor = FlutterVideoCompress();
     var info = await compressor.compressVideo(widget.file.absolute.path, quality: quality, includeAudio: true);
-    await GallerySaver.saveVideo(info.path, albumName: "Compressed");
     if (mounted){
       setState(() {
         compFileSize = info.filesize;
@@ -108,6 +110,16 @@ class _VideoPageState extends State<VideoPage> {
                       children: <Widget>[
                         Container(
                           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                          margin: EdgeInsets.fromLTRB(12, 0, 12, 8),
+                          child: Text("Click the play button to play the video. Click the save button to save the video to the gallery.", style: textSub),
+                          decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(12)),
+                        ),             
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 8),
+                          child: Divider(color: Colors.blue,),
+                        ),      
+                        Container(
+                          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
                           margin: EdgeInsets.fromLTRB(16, 0, 16, 16),
                           child: Column(
                             children: <Widget>[
@@ -122,7 +134,7 @@ class _VideoPageState extends State<VideoPage> {
                           child: VideoPlayer(_controller)
                         ),
                         FlatButton(
-                          child: Icon(playing ? Icons.pause : Icons.play_arrow), 
+                          child: Icon(playing ? Icons.pause : Icons.play_arrow, color: Colors.white), 
                           color: Colors.blue,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           onPressed: () async {
@@ -175,7 +187,7 @@ class _VideoPageState extends State<VideoPage> {
                           child: VideoPlayer(_controller2)
                         ),
                         FlatButton(
-                          child: Icon(playing2 ? Icons.pause : Icons.play_arrow), 
+                          child: Icon(playing2 ? Icons.pause : Icons.play_arrow, color: Colors.white), 
                           color: Colors.blue,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           onPressed: () async {
@@ -185,6 +197,35 @@ class _VideoPageState extends State<VideoPage> {
                             });
                           }
                         ),
+                        Container(child: Divider(color: Colors.blue,), margin: EdgeInsets.symmetric(vertical: 8),),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 28),
+                          child: IgnorePointer(
+                            ignoring: lock,
+                            child: FlatButton(
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              color: Colors.blue,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: EdgeInsets.only(right: 4),
+                                    child: Text("Save To Gallery", style: textS),
+                                  ),
+                                  Icon(Icons.save_alt, color: Colors.white,)
+                                ],
+                              ),
+                              onPressed: () async {
+                                setState(() {
+                                  lock = true;
+                                });
+                                await GallerySaver.saveVideo(compressedVideo.absolute.path, albumName: "Compressed");
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ),
+                        )
                       ],
                     )
                   ],                        
