@@ -9,7 +9,7 @@ import 'package:path_provider/path_provider.dart';
 
 class ImagePage extends StatefulWidget {
   ImagePage({Key key, this.file, this.quality}) : super(key: key);
-  
+
   final File file;
   final int quality;
 
@@ -18,25 +18,24 @@ class ImagePage extends StatefulWidget {
 }
 
 class _ImagePageState extends State<ImagePage> {
-
-  var textS = TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w400);
-  var textSub = TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w300);
+  var textS =
+      TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w400);
+  var textSub =
+      TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w300);
   bool lock = false;
 
-  Future<File> fetchImage () async {
+  Future<File> fetchImage() async {
     var randomname = randomAlphaNumeric(16);
     Directory tempDir = await getTemporaryDirectory();
     String tempPath = tempDir.path;
     File result = await FlutterImageCompress.compressAndGetFile(
-      widget.file.absolute.path, tempPath + "/" + randomname + ".jpg", 
-      format: CompressFormat.jpeg,
-      quality: widget.quality
-    );
+        widget.file.absolute.path, tempPath + "/" + randomname + ".jpg",
+        format: CompressFormat.jpeg, quality: widget.quality);
     return result;
   }
 
   @override
-  Widget build(BuildContext context) {    
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Compress Image'),
@@ -44,123 +43,169 @@ class _ImagePageState extends State<ImagePage> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 4, vertical: 12),
-          child: Column(
-            children: <Widget>[
-              FutureBuilder(
-                future: fetchImage(),
-                builder: (context, AsyncSnapshot<File> snapshot) {
-                  if(snapshot.hasData){
-                    var bytes = snapshot.data.readAsBytesSync();
-                    Image image = Image.memory(bytes);
-                    return Column(
-                      children: <Widget>[
-                        Container(
-                          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                          margin: EdgeInsets.fromLTRB(12, 0, 12, 8),
-                          child: Text("Double click the image to zoom and examine the details. Click the save button to save the image to the gallery.", style: textSub),
-                          decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(12)),
-                        ),             
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 8),
-                          child: Divider(color: Colors.blue,),
-                        ),      
-                        Container(
-                          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                          margin: EdgeInsets.fromLTRB(16, 0, 16, 16),
-                          child: Column(
-                            children: <Widget>[
-                              Text("Old File Size: " + formatBytes(widget.file.lengthSync(), 2), style: textS),
-                              Divider(color: Colors.transparent, height: 0,),
-                            ],
+            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 12),
+            child: Column(
+              children: <Widget>[
+                FutureBuilder(
+                  future: fetchImage(),
+                  builder: (context, AsyncSnapshot<File> snapshot) {
+                    if (snapshot.hasData) {
+                      var bytes = snapshot.data.readAsBytesSync();
+                      Image image = Image.memory(bytes);
+                      return Column(
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 20),
+                            margin: EdgeInsets.fromLTRB(12, 0, 12, 8),
+                            child: Text(
+                                "Double click the image to zoom and examine the details. Click the save button to save the image to the gallery.",
+                                style: textSub),
+                            decoration: BoxDecoration(
+                                color: Colors.blue,
+                                borderRadius: BorderRadius.circular(12)),
                           ),
-                          decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(12)),
-                        ),                   
-                        Container(
-                          height: MediaQuery.of(context).size.height * 0.35, 
-                          width: MediaQuery.of(context).size.width,
-                          child: ClipRect(
-                            child: PhotoView(
-                              imageProvider: Image.file(widget.file).image
-                              )
-                            )
-                        ),  
-                        Container(child: Divider(color: Colors.blue,), margin: EdgeInsets.symmetric(vertical: 8),),
-                        Container(
-                          padding: EdgeInsets.symmetric(vertical: 8),
-                          margin: EdgeInsets.fromLTRB(16, 0, 16, 16),
-                          child: Column(
-                            children: <Widget>[
-                              Text("New File Size: " + formatBytes(snapshot.data.lengthSync(), 2), style: textS),
-                              Divider(color: Colors.white),
-                              Text("Reduction: " + ((widget.file.lengthSync() - snapshot.data.lengthSync()) / widget.file.lengthSync() * 100).toStringAsFixed(0) + "%", style: textSub),
-                              if(widget.file.lengthSync() - snapshot.data.lengthSync() < 0)
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(12, 6, 12, 0),
-                                  child: Text("The quality was too high for the reduction to occur. Please decrease the quality for compression.", style: textSub),
-                                ),
-                            ],
-                          ),
-                          decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(12)),
-                        ),                   
-                        Container(
-                          height: MediaQuery.of(context).size.height * 0.35, 
-                          width: MediaQuery.of(context).size.width,
-                          child: ClipRect(
-                            child: PhotoView(
-                              imageProvider: image.image
-                            )
-                          )
-                        ),
-                        Container(child: Divider(color: Colors.blue,), margin: EdgeInsets.symmetric(vertical: 8),),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 28),
-                          child: IgnorePointer(
-                            ignoring: lock,
-                            child: FlatButton(
-                              padding: EdgeInsets.symmetric(vertical: 12),
-                              color: Colors.blueAccent,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: EdgeInsets.only(right: 4),
-                                    child: Text("Save To Gallery", style: textS),
-                                  ),
-                                  Icon(Icons.save_alt, color: Colors.white,)
-                                ],
-                              ),
-                              onPressed: () async {
-                                setState(() {
-                                  lock = true;
-                                });
-                                await GallerySaver.saveImage(snapshot.data.absolute.path, albumName: "Compressed");
-                                Navigator.pop(context);
-                              },
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 8),
+                            child: Divider(
+                              color: Colors.blue,
                             ),
                           ),
-                        )
-                      ],
-                    );
-                  }
-                  else {
-                    return Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.08,
-                          width: MediaQuery.of(context).size.height * 0.08,
-                          child: CircularProgressIndicator()
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 20),
+                            margin: EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            child: Column(
+                              children: <Widget>[
+                                Text(
+                                    "Old File Size: " +
+                                        formatBytes(
+                                            widget.file.lengthSync(), 2),
+                                    style: textS),
+                                Divider(
+                                  color: Colors.transparent,
+                                  height: 0,
+                                ),
+                              ],
+                            ),
+                            decoration: BoxDecoration(
+                                color: Colors.blue,
+                                borderRadius: BorderRadius.circular(12)),
+                          ),
+                          Container(
+                              height: MediaQuery.of(context).size.height * 0.35,
+                              width: MediaQuery.of(context).size.width,
+                              child: ClipRect(
+                                  child: PhotoView(
+                                      imageProvider:
+                                          Image.file(widget.file).image))),
+                          Container(
+                            child: Divider(
+                              color: Colors.blue,
+                            ),
+                            margin: EdgeInsets.symmetric(vertical: 8),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(vertical: 8),
+                            margin: EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            child: Column(
+                              children: <Widget>[
+                                Text(
+                                    "New File Size: " +
+                                        formatBytes(
+                                            snapshot.data.lengthSync(), 2),
+                                    style: textS),
+                                Divider(color: Colors.white),
+                                Text(
+                                    "Reduction: " +
+                                        ((widget.file.lengthSync() -
+                                                    snapshot.data
+                                                        .lengthSync()) /
+                                                widget.file.lengthSync() *
+                                                100)
+                                            .toStringAsFixed(0) +
+                                        "%",
+                                    style: textSub),
+                                if (widget.file.lengthSync() -
+                                        snapshot.data.lengthSync() <
+                                    0)
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(12, 6, 12, 0),
+                                    child: Text(
+                                        "The quality was too high for the reduction to occur. Please decrease the quality for compression.",
+                                        style: textSub),
+                                  ),
+                              ],
+                            ),
+                            decoration: BoxDecoration(
+                                color: Colors.blue,
+                                borderRadius: BorderRadius.circular(12)),
+                          ),
+                          Container(
+                              height: MediaQuery.of(context).size.height * 0.35,
+                              width: MediaQuery.of(context).size.width,
+                              child: ClipRect(
+                                  child:
+                                      PhotoView(imageProvider: image.image))),
+                          Container(
+                            child: Divider(
+                              color: Colors.blue,
+                            ),
+                            margin: EdgeInsets.symmetric(vertical: 8),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 28),
+                            child: IgnorePointer(
+                              ignoring: lock,
+                              child: FlatButton(
+                                padding: EdgeInsets.symmetric(vertical: 12),
+                                color: Colors.blueAccent,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: EdgeInsets.only(right: 4),
+                                      child:
+                                          Text("Save To Gallery", style: textS),
+                                    ),
+                                    Icon(
+                                      Icons.save_alt,
+                                      color: Colors.white,
+                                    )
+                                  ],
+                                ),
+                                onPressed: () async {
+                                  setState(() {
+                                    lock = true;
+                                  });
+                                  await GallerySaver.saveImage(
+                                      snapshot.data.absolute.path,
+                                      albumName: "Compressed");
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ),
+                          )
+                        ],
+                      );
+                    } else {
+                      return Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.08,
+                              width: MediaQuery.of(context).size.height * 0.08,
+                              child: CircularProgressIndicator()),
                         ),
-                      ),
-                    );
-                  }
-                },
-              )
-            ],
-          )
-        ),
+                      );
+                    }
+                  },
+                )
+              ],
+            )),
       ),
     );
   }

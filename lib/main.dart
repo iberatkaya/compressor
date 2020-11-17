@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import './image.dart';
 import './video.dart';
-import 'dart:io' show Platform;
+import 'dart:io' show File, Platform;
 
 void main() {
   runApp(MyApp());
@@ -31,59 +31,94 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key}) : super(key: key);
 
-
-
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   double value = 60.0;
   double value2 = 2.0;
   int ctr = 0;
-  List<InterstitialAd> intAd = [];
   int adFreq = 2;
-  var textS = TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w400);
-  var textSub = TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w300);
-  var textQuality = TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w400);
-
+  var textS =
+      TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w400);
+  var textSub =
+      TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w300);
+  var textQuality =
+      TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w400);
 
   @override
   void initState() {
     super.initState();
-    FirebaseAdMob.instance.initialize(appId: Platform.isIOS ? iosAppId : androidAppId);
-    intAd.add(InterstitialAd(adUnitId: release ? (Platform.isIOS ? iosIntersitial : androidIntersitial) : InterstitialAd.testAdUnitId));
-    intAd[0].load();
+    initFirebase();
+  }
+
+  InterstitialAd interstitialAd() => InterstitialAd(
+        adUnitId: release
+            ? (Platform.isIOS ? iosIntersitial : androidIntersitial)
+            : InterstitialAd.testAdUnitId,
+        /*targetingInfo: MobileAdTargetingInfo(
+          testDevices: <String>[deviceTestId],
+        ),*/
+        listener: (MobileAdEvent event) {
+          print("InterstitialAd event is $event");
+        },
+      );
+
+  initFirebase() async {
+    try {
+      await FirebaseAdMob.instance
+          .initialize(appId: Platform.isIOS ? iosAppId : androidAppId);
+    } catch (e) {
+      print(e);
+    }
   }
 
   checkPermDenied(Permission p) async {
-    bool perm = await p.isUndetermined || await p.isPermanentlyDenied || await p.isDenied;
+    bool perm = await p.isUndetermined ||
+        await p.isPermanentlyDenied ||
+        await p.isDenied;
     return perm;
   }
 
-  videoQuality(int val){
-    if(val == 1)
+  videoQuality(int val) {
+    if (val == 1)
       return "Low";
-    else if(val == 2)
+    else if (val == 2)
       return "Medium";
     else
       return "High";
   }
+
   pickAndNav(String type) async {
-    var res = await checkPermDenied(Platform.isIOS ? Permission.mediaLibrary : Permission.storage); 
-    if(res){
-      var req = Platform.isIOS ? await Permission.mediaLibrary.request() : await Permission.storage.request();
-      if(req.isDenied){
+    var res = await checkPermDenied(
+        Platform.isIOS ? Permission.mediaLibrary : Permission.storage);
+    if (res) {
+      var req = Platform.isIOS
+          ? await Permission.mediaLibrary.request()
+          : await Permission.storage.request();
+      if (req.isDenied) {
         Fluttertoast.showToast(msg: "Permission denied!");
         return;
       }
     }
-    var file = (type == "image" ? await ImagePicker.pickImage(source: ImageSource.gallery) : await ImagePicker.pickVideo(source: ImageSource.gallery));
-    if(file != null)
-      Navigator.push(context, MaterialPageRoute(builder: (context) => type == "image" ? ImagePage(file: file, quality: value.toInt(),) : VideoPage(file: file, quality: value2.toInt(),) ));
+    var file = (type == "image"
+        ? await ImagePicker().getImage(source: ImageSource.gallery)
+        : await ImagePicker().getVideo(source: ImageSource.gallery));
+    if (file != null)
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => type == "image"
+                  ? ImagePage(
+                      file: File(file.path),
+                      quality: value.toInt(),
+                    )
+                  : VideoPage(
+                      file: File(file.path),
+                      quality: value2.toInt(),
+                    )));
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -99,12 +134,12 @@ class _MyHomePageState extends State<MyHomePage> {
               children: <Widget>[
                 Expanded(
                   child: Container(
-                    decoration: BoxDecoration(color: Color.fromRGBO(233, 228, 255, 1)),
+                    decoration:
+                        BoxDecoration(color: Color.fromRGBO(233, 228, 255, 1)),
                     child: Container(
-                      padding: EdgeInsets.only(top: 16),
-                      height: MediaQuery.of(context).size.height * 0.25,
-                      child: Image.asset("icon.png")
-                    ),
+                        padding: EdgeInsets.only(top: 16),
+                        height: MediaQuery.of(context).size.height * 0.25,
+                        child: Image.asset("icon.png")),
                   ),
                 ),
               ],
@@ -113,7 +148,9 @@ class _MyHomePageState extends State<MyHomePage> {
               title: Text("Other Apps"),
               leading: Icon(Icons.apps),
               onTap: () async {
-                String url = (Platform.isIOS ? 'https://apps.apple.com/us/developer/selim-ustel/id1498230191' : 'https://play.google.com/store/apps/developer?id=IBK+Apps');
+                String url = (Platform.isIOS
+                    ? 'https://apps.apple.com/us/developer/selim-ustel/id1498230191'
+                    : 'https://play.google.com/store/apps/developer?id=IBK+Apps');
                 if (await canLaunch(url)) {
                   await launch(url);
                 } else {
@@ -124,22 +161,21 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               title: Text("Help"),
               leading: Icon(Icons.help_outline),
-              onTap: (){
+              onTap: () {
                 showDialog(
-                  context: context, 
-                  child: AlertDialog(
-                    title: Text("Help"),
-                    content: Text("Select the quality and start compressing! Select either an image or video to compress it."),
-                    actions: <Widget>[
-                      FlatButton(
-                        onPressed: (){
-                          Navigator.of(context).pop();
-                        }, 
-                        child: Text("OK")
-                      )
-                    ],
-                  )
-                );
+                    context: context,
+                    child: AlertDialog(
+                      title: Text("Help"),
+                      content: Text(
+                          "Select the quality and start compressing! Select either an image or video to compress it."),
+                      actions: <Widget>[
+                        FlatButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text("OK"))
+                      ],
+                    ));
               },
             ),
           ],
@@ -158,17 +194,19 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: FlatButton(
                         color: Colors.blue,
                         padding: EdgeInsets.symmetric(vertical: 20),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(32)),
                         onPressed: () async {
                           try {
                             await pickAndNav("image");
-                            if(ctr % adFreq == 0){
-                              intAd.add(InterstitialAd(adUnitId: release ? (Platform.isIOS ? iosIntersitial : androidIntersitial) : InterstitialAd.testAdUnitId));
-                              intAd[ctr ~/ adFreq + 1].load();
-                              await intAd[ctr ~/ adFreq].show();
-                            }
                             ctr++;
-                          } catch(e) {
+                            if (ctr % adFreq == 1) {
+                              print("show ad");
+                              final myInterstitialAd = interstitialAd();
+                              await myInterstitialAd.load();
+                              await myInterstitialAd.show();
+                            }
+                          } catch (e) {
 //                            Fluttertoast.showToast(msg: e.toString());
                             print(e);
                           }
@@ -179,28 +217,44 @@ class _MyHomePageState extends State<MyHomePage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 Text("Image", style: textS),
-                                Padding(padding: EdgeInsets.symmetric(horizontal: 4)),
-                                Icon(Icons.image, color: Colors.white, size: 32,)
+                                Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 4)),
+                                Icon(
+                                  Icons.image,
+                                  color: Colors.white,
+                                  size: 32,
+                                )
                               ],
                             ),
                             Padding(
                               padding: EdgeInsets.symmetric(vertical: 8),
-                              child: Divider(color: Colors.white,),
+                              child: Divider(
+                                color: Colors.white,
+                              ),
                             ),
-                            Text("Quality: " + value.toInt().toString() + "%", style: textQuality,),
+                            Text(
+                              "Quality: " + value.toInt().toString() + "%",
+                              style: textQuality,
+                            ),
                             Slider(
-                              activeColor: Colors.white,
-                              inactiveColor: Colors.white38,
-                              value: value,
-                              min: 1.0,
-                              divisions: 98,
-                              max: 99.0,
-                              onChanged: (val) => setState(() => (value = val))
+                                activeColor: Colors.white,
+                                inactiveColor: Colors.white38,
+                                value: value,
+                                min: 1.0,
+                                divisions: 98,
+                                max: 99.0,
+                                onChanged: (val) =>
+                                    setState(() => (value = val))),
+                            Divider(
+                              color: Colors.white,
                             ),
-                            Divider(color: Colors.white,),
                             Padding(
                               padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-                              child: Text("Slide to select the quality of compresion. The smaller the quality is the smaller the image size will be. Select an image and a quality percantage and wait for the compression.", style: textSub,),
+                              child: Text(
+                                "Slide to select the quality of compresion. The smaller the quality is the smaller the image size will be. Select an image and a quality percantage and wait for the compression.",
+                                style: textSub,
+                              ),
                             )
                           ],
                         ),
@@ -211,7 +265,9 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 8),
-                child: Divider(color: Colors.blue,),
+                child: Divider(
+                  color: Colors.blue,
+                ),
               ),
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 8),
@@ -221,16 +277,19 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: FlatButton(
                         color: Colors.blue,
                         padding: EdgeInsets.symmetric(vertical: 20),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(32)),
                         onPressed: () async {
                           try {
                             await pickAndNav("video");
-                            if(ctr % adFreq == 0)
-                              intAd.add(InterstitialAd(adUnitId: release ? (Platform.isIOS ? iosIntersitial : androidIntersitial) : InterstitialAd.testAdUnitId));
-                              intAd[ctr ~/ adFreq + 1].load();
-                              await intAd[ctr ~/ adFreq].show();
                             ctr++;
-                          } catch(e) {
+                            if (ctr % adFreq == 1) {
+                              final myInterstitialAd = interstitialAd();
+                              print("show ad");
+                              await myInterstitialAd.load();
+                              await myInterstitialAd.show();
+                            }
+                          } catch (e) {
 //                            Fluttertoast.showToast(msg: e.toString());
                             print(e);
                           }
@@ -241,28 +300,44 @@ class _MyHomePageState extends State<MyHomePage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 Text("Video", style: textS),
-                                Padding(padding: EdgeInsets.symmetric(horizontal: 4)),
-                                Icon(Icons.play_circle_filled, color: Colors.white, size: 32,)
+                                Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 4)),
+                                Icon(
+                                  Icons.play_circle_filled,
+                                  color: Colors.white,
+                                  size: 32,
+                                )
                               ],
                             ),
                             Padding(
                               padding: EdgeInsets.symmetric(vertical: 8),
-                              child: Divider(color: Colors.white,),
+                              child: Divider(
+                                color: Colors.white,
+                              ),
                             ),
-                            Text(videoQuality(value2.toInt()) + " Quality", style: textQuality,),
+                            Text(
+                              videoQuality(value2.toInt()) + " Quality",
+                              style: textQuality,
+                            ),
                             Slider(
-                              activeColor: Colors.white,
-                              inactiveColor: Colors.white38,
-                              value: value2,
-                              min: 1.0,
-                              divisions: 2,
-                              max: 3.0,
-                              onChanged: (val) => setState(() => (value2 = val))
+                                activeColor: Colors.white,
+                                inactiveColor: Colors.white38,
+                                value: value2,
+                                min: 1.0,
+                                divisions: 2,
+                                max: 3.0,
+                                onChanged: (val) =>
+                                    setState(() => (value2 = val))),
+                            Divider(
+                              color: Colors.white,
                             ),
-                            Divider(color: Colors.white,),
                             Padding(
                               padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-                              child: Text("Slide to select the quality of compresion. The smaller the quality is the smaller the image or video size will be. Select a video and a quality percantage and wait for the compression.", style: textSub,),
+                              child: Text(
+                                "Slide to select the quality of compresion. The smaller the quality is the smaller the image or video size will be. Select a video and a quality percantage and wait for the compression.",
+                                style: textSub,
+                              ),
                             )
                           ],
                         ),
